@@ -1,0 +1,81 @@
+vspen/
+├── index.html
+├── manifest.json
+├── sw.js
+│
+├── css/
+│   ├── design-system.css      ← Variables CSS, reset, tokens
+│   ├── layout.css             ← Grid principal, paneles, resize
+│   ├── components.css         ← UI: tabs, sidebar, statusbar, modals
+│   ├── editor.css             ← Textarea, highlight overlay, line numbers
+│   └── themes/
+│       ├── dark-default.css
+│       └── light-default.css
+│
+├── js/
+│   ├── app.js                 ← Bootstrap, wiring de servicios
+│   │
+│   ├── core/
+│   │   ├── event-bus.js       ← Pub/Sub desacoplado
+│   │   ├── service-registry.js← Contenedor DI + lazy init
+│   │   ├── storage-service.js ← Abstracción localStorage con versionado
+│   │   ├── command-palette.js ← Sistema de comandos registrables
+│   │   └── constants.js       ← Eventos, tipos, claves (sin magic strings)
+│   │
+│   ├── filesystem/
+│   │   ├── virtual-fs.js      ← Clase VFS en memoria
+│   │   ├── file-node.js       ← Estructura árbol (carpetas + archivos)
+│   │   ├── serializer.js      ← JSON safe serialize/deserialize
+│   │   └── fs-watchers.js     ← Notificaciones vía EventBus
+│   │
+│   ├── editor/
+│   │   ├── editor-core.js     ← Textarea management, cursor, selección
+│   │   ├── syntax-highlighter.js ← Tokenizer regex extensible por lang
+│   │   ├── line-numbers.js    ← Renderizado + sync scroll
+│   │   ├── auto-close-pairs.js← Pares configurables (), {}, "", ''
+│   │   ├── undo-manager.js    ← Stack limitado de operaciones
+│   │   └── languages/
+│   │       ├── typescript.js  ← Reglas TS/TSX
+│   │       ├── javascript.js  ← Reglas JS/JSX
+│   │       ├── css.js         ← Reglas CSS
+│   │       └── html.js        ← Reglas HTML
+│   │
+│   ├── compiler/
+│   │   ├── compiler-service.js← Interfaz abstracta
+│   │   ├── babel-adapter.js   ← Implementación Babel Standalone
+│   │   ├── import-resolver.js ← bare imports → esm.sh URLs
+│   │   ├── cache-layer.js     ← Memoización compilaciones
+│   │   └── error-normalizer.js← Formato uniforme multi-compilador
+│   │
+│   ├── preview/
+│   │   ├── sandbox-manager.js ← Iframe lifecycle
+│   │   ├── preview-bridge.js  ← postMessage protocol bidireccional
+│   │   └── hot-reload.js      ← Inyección incremental sin recarga
+│   │
+│   └── ui/
+│       ├── component-system.js← Renderizado declarativo vanilla
+│       ├── layout-engine.js   ← Paneles redimensionables + persistencia
+│       ├── theme-engine.js    ← Dark/light switch + variables CSS
+│       ├── icon-registry.js   ← SVGs inline por nombre
+│       └── components/
+│           ├── title-bar.js
+│           ├── activity-bar.js
+│           ├── sidebar.js
+│           ├── tab-bar.js
+│           ├── breadcrumbs.js
+│           ├── status-bar.js
+│           ├── error-panel.js
+│           ├── file-explorer.js
+│           └── modal-dialog.js
+│
+├── assets/
+│   ├── icons/                 ← SVGs individuales (explorer, search, git...)
+│   └── default-project/       ← Plantilla inicial de archivos
+│       ├── app.tsx
+│       ├── styles.css
+│       └── index.html
+│
+└── docs/
+    ├── architecture.md        ← Diagrama de módulos + dependencias
+    ├── extending.md           ← Cómo añadir compiladores/lenguajes/UI
+    └── publishing.md          ← Guía GitHub Pages / offline

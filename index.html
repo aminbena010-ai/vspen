@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VSPen - IDE nativo del navegador. Sin npm, sin backend, 100% local.">
+    <meta name="theme-color" content="#007acc">
+    <title>VSPen — Browser-Native IDE</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    
+    <!-- CSS Design System (orden estricto) -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/themes/dark-default.css">
+    <link rel="stylesheet" href="css/themes/light-default.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/editor.css">
+    
+    <!-- Preload crítico -->
+    <link rel="preload" href="js/core/constants.js" as="script">
+    <link rel="preload" href="js/core/event-bus.js" as="script">
+    
+    <!-- Babel Standalone (única dependencia externa pesada) -->
+    <script src="https://unpkg.com/@babel/standalone@7.24.0/babel.min.js" defer></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading">
+        <div class="spinner"></div>
+        <p class="loading-screen__text">Iniciando VSPen...</p>
+    </div>
+
+    <!-- App Shell -->
+    <div class="app-shell">
+        <!-- Title Bar -->
+        <div id="ui-titlebar"></div>
+
+        <!-- Workspace -->
+        <div class="workspace">
+            <!-- Activity Bar -->
+            <div id="ui-activitybar"></div>
+
+            <!-- Sidebar / Explorer -->
+            <div id="ui-explorer-container"></div>
+
+            <!-- Editor Area -->
+            <div class="editor-area">
+                <div id="ui-tab-bar"></div>
+                <div class="breadcrumbs" id="ui-breadcrumbs">
+                    <span class="breadcrumbs__segment">src</span>
+                    <span class="breadcrumbs__separator">›</span>
+                    <span class="breadcrumbs__segment">app.tsx</span>
+                </div>
+                <div class="code-container">
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <div class="code-editor">
+                        <div class="code-highlight" id="code-highlight"></div>
+                        <textarea 
+                            class="code-textarea" 
+                            id="code-textarea" 
+                            spellcheck="false"
+                            autocapitalize="off"
+                            autocomplete="off"
+                        ></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resize Handle -->
+            <div class="resize-handle" id="resize-handle"></div>
+
+            <!-- Preview Panel -->
+            <div class="preview-panel" id="preview-panel">
+                <div class="preview-panel__toolbar">
+                    <button class="preview-panel__toolbar-btn" id="btn-reload-preview" title="Recargar Preview">
+                        <!-- Icono inyectado por JS -->
+                    </button>
+                    <div class="preview-panel__url-bar">vspen://preview/app.tsx</div>
+                </div>
+                <iframe 
+                    class="preview-panel__frame" 
+                    id="preview-frame" 
+                    sandbox="allow-scripts allow-modals allow-same-origin"
+                    title="VSPen Preview"
+                ></iframe>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div id="ui-statusbar"></div>
+    </div>
+
+    <!-- Error Panel (fuera del flujo normal) -->
+    <div id="ui-error-panel"></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ============================================
+         JAVASCRIPT MODULES (orden estricto de dependencias)
+         ============================================ -->
+    
+    <!-- Core Infrastructure -->
+    <script src="js/core/constants.js"></script>
+    <script src="js/core/event-bus.js"></script>
+    <script src="js/core/service-registry.js"></script>
+    <script src="js/core/storage-service.js"></script>
+    <script src="js/core/command-palette.js"></script>
+
+    <!-- Filesystem Module -->
+    <script src="js/filesystem/file-node.js"></script>
+    <script src="js/filesystem/serializer.js"></script>
+    <script src="js/filesystem/virtual-fs.js"></script>
+    <script src="js/filesystem/fs-watchers.js"></script>
+
+    <!-- Editor Module -->
+    <script src="js/editor/languages/typescript.js"></script>
+    <script src="js/editor/languages/javascript.js"></script>
+    <script src="js/editor/languages/css.js"></script>
+    <script src="js/editor/languages/html.js"></script>
+    <script src="js/editor/syntax-highlighter.js"></script>
+    <script src="js/editor/line-numbers.js"></script>
+    <script src="js/editor/auto-close-pairs.js"></script>
+    <script src="js/editor/undo-manager.js"></script>
+    <script src="js/editor/editor-core.js"></script>
+
+    <!-- Compiler Module -->
+    <script src="js/compiler/cache-layer.js"></script>
+    <script src="js/compiler/import-resolver.js"></script>
+    <script src="js/compiler/error-normalizer.js"></script>
+    <script src="js/compiler/babel-adapter.js"></script>
+    <script src="js/compiler/compiler-service.js"></script>
+
+    <!-- Preview Module -->
+    <script src="js/preview/sandbox-manager.js"></script>
+    <script src="js/preview/preview-bridge.js"></script>
+    <script src="js/preview/hot-reload.js"></script>
+
+    <!-- UI Module -->
+    <script src="js/ui/icon-registry.js"></script>
+    <script src="js/ui/component-system.js"></script>
+    <script src="js/ui/theme-engine.js"></script>
+    <script src="js/ui/layout-engine.js"></script>
+    <script src="js/ui/components/title-bar.js"></script>
+    <script src="js/ui/components/activity-bar.js"></script>
+    <script src="js/ui/components/file-explorer.js"></script>
+    <script src="js/ui/components/tab-bar.js"></script>
+    <script src="js/ui/components/status-bar.js"></script>
+    <script src="js/ui/components/error-panel.js"></script>
+
+    <!-- Application Bootstrap (SIEMPRE último) -->
+    <script src="app.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(reg) {
+                        console.log('[SW] Registered:', reg.scope);
+                    })
+                    .catch(function(err) {
+                        console.warn('[SW] Registration failed:', err);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

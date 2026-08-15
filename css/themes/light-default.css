@@ -1,0 +1,82 @@
+/* ============================================
+   THEME: Light Default (VS Code Light Inspired)
+   ============================================ */
+
+:root[data-theme="light-default"] {
+  /* Backgrounds */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f3f3;
+  --bg-tertiary: #e8e8e8;
+  --bg-hover: #e4e6f1;
+  --bg-active: #dbeaf8;
+  --bg-titlebar: #dddddd;
+  --bg-input: #ffffff;
+  --bg-badge: #c4c4c4;
+
+  /* Foregrounds */
+  --fg-primary: #333333;
+  --fg-secondary: #616161;
+  --fg-muted: #999999;
+  --fg-inverse: #ffffff;
+
+  /* Accent */
+  --accent: #005fb8;
+  --accent-hover: #0078d4;
+  --accent-muted: rgba(0, 95, 184, 0.15);
+
+  /* Semantic Colors */
+  --error: #e51400;
+  --error-bg: rgba(229, 20, 0, 0.08);
+  --warning: #bf8803;
+  --warning-bg: rgba(191, 136, 3, 0.08);
+  --success: #16825d;
+  --success-bg: rgba(22, 130, 93, 0.08);
+  --info: #1a73e8;
+
+  /* Borders */
+  --border: #d4d4d4;
+  --border-light: #e0e0e0;
+  --focus-border: #005fb8;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #b0b0b0;
+  --scrollbar-thumb-hover: #909090;
+
+  /* Syntax Highlighting */
+  --syntax-keyword: #af00db;
+  --syntax-string: #a31515;
+  --syntax-number: #098658;
+  --syntax-comment: #008000;
+  --syntax-function: #795e26;
+  --syntax-type: #267f99;
+  --syntax-tag: #0000ff;
+  --syntax-attr: #e50000;
+  --syntax-punct: #000000;
+  --syntax-variable: #001080;
+  --syntax-builtin: #267f99;
+  --syntax-regex: #811f3f;
+
+  /* Selection */
+  --selection-bg: rgba(173, 214, 255, 0.5);
+  --selection-fg: transparent;
+
+  /* Editor Specific */
+  --editor-bg: #ffffff;
+  --editor-gutter-bg: #ffffff;
+  --editor-line-highlight: #f5f5f5;
+  --editor-bracket-match-bg: rgba(0, 100, 0, 0.1);
+  --editor-bracket-match-border: rgba(0, 100, 0, 0.3);
+  --editor-find-match-bg: rgba(234, 179, 8, 0.25);
+  --editor-find-match-current-bg: rgba(234, 179, 8, 0.5);
+  --editor-cursor: #000000;
+  --editor-whitespace: rgba(0, 0, 0, 0.08);
+}
+
+/* Override scrollbar track for light theme */
+:root[data-theme="light-default"] ::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+:root[data-theme="light-default"] ::-webkit-scrollbar-thumb {
+  border-color: #ffffff;
+}

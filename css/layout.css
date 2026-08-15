@@ -1,0 +1,282 @@
+/* ============================================
+   LAYOUT - Main Grid, Panels, Resize
+   ============================================ */
+
+/* --- App Shell --- */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: var(--bg-primary);
+  color: var(--fg-primary);
+}
+
+/* --- Title Bar --- */
+.titlebar {
+  height: var(--titlebar-height);
+  background: var(--bg-titlebar);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  border-bottom: var(--border-width) solid var(--border);
+  user-select: none;
+  flex-shrink: 0;
+  z-index: var(--z-base);
+}
+
+.titlebar__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: #fff;
+}
+
+.titlebar__logo svg {
+  width: 16px;
+  height: 16px;
+}
+
+.titlebar__menu {
+  display: flex;
+  gap: 2px;
+  margin-left: var(--space-4);
+}
+
+.titlebar__menu-item {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  transition: background var(--transition-fast);
+}
+
+.titlebar__menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.titlebar__title {
+  flex: 1;
+  text-align: center;
+  color: var(--fg-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* --- Main Workspace --- */
+.workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0; /* Critical for flex children overflow */
+}
+
+/* --- Activity Bar --- */
+.activitybar {
+  width: var(--activitybar-width);
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: var(--space-1);
+  border-right: var(--border-width) solid var(--border);
+  flex-shrink: 0;
+}
+
+.activitybar__icon {
+  width: var(--activitybar-width);
+  height: var(--activitybar-width);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.5;
+  position: relative;
+  transition: opacity var(--transition-fast);
+}
+
+.activitybar__icon:hover,
+.activitybar__icon.active {
+  opacity: 1;
+}
+
+.activitybar__icon.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.activitybar__icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.activitybar__spacer {
+  flex: 1;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-secondary);
+  border-right: var(--border-width) solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: width var(--transition-normal);
+}
+
+.sidebar.collapsed {
+  width: 0;
+  border-right: none;
+}
+
+.sidebar__header {
+  height: var(--tab-height);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--fg-secondary);
+  border-bottom: var(--border-width) solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-1) 0;
+}
+
+/* --- Editor Area --- */
+.editor-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevent flex blowout */
+  background: var(--bg-primary);
+}
+
+/* --- Resize Handle --- */
+.resize-handle {
+  width: 4px;
+  background: var(--border);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background var(--transition-fast);
+  z-index: var(--z-base);
+}
+
+.resize-handle:hover,
+.resize-handle.dragging {
+  background: var(--accent);
+}
+
+/* --- Preview Panel --- */
+.preview-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  min-width: 0;
+}
+
+.preview-panel__toolbar {
+  height: var(--tab-height);
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-2);
+  gap: var(--space-2);
+  border-bottom: var(--border-width) solid var(--border);
+  flex-shrink: 0;
+}
+
+.preview-panel__toolbar-btn {
+  background: none;
+  border: none;
+  color: var(--fg-secondary);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  transition: all var(--transition-fast);
+}
+
+.preview-panel__toolbar-btn:hover {
+  color: var(--fg-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.preview-panel__url-bar {
+  flex: 1;
+  background: var(--bg-primary);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--fg-secondary);
+  font-family: var(--font-mono);
+}
+
+.preview-panel__frame {
+  flex: 1;
+  border: none;
+  width: 100%;
+  background: #fff;
+}
+
+/* --- Status Bar --- */
+.statusbar {
+  height: var(--statusbar-height);
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-xs);
+  color: #fff;
+  flex-shrink: 0;
+  z-index: var(--z-base);
+}
+
+.statusbar__left,
+.statusbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.statusbar__right {
+  margin-left: auto;
+}
+
+.statusbar__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  cursor: pointer;
+  padding: 0 var(--space-1);
+  border-radius: 2px;
+  transition: background var(--transition-fast);
+}
+
+.statusbar__item:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.statusbar__item svg {
+  width: 12px;
+  height: 12px;
+}
