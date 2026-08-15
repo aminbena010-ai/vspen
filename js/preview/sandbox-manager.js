@@ -40,8 +40,9 @@ class SandboxManager {
 
     this._iframe = iframeElement;
 
-    // Configurar sandbox restrictivo
-    this._iframe.setAttribute('sandbox', 'allow-scripts allow-modals allow-same-origin');
+    // Mantener el preview en un origen opaco: combinar allow-scripts con
+    // allow-same-origin permitiría al documento cargado retirar su sandbox.
+    this._iframe.setAttribute('sandbox', 'allow-scripts allow-modals');
     this._iframe.setAttribute('loading', 'lazy');
     this._iframe.setAttribute('title', 'VSPen Preview');
 
@@ -248,13 +249,13 @@ class SandboxManager {
         reject(new DOMException('Aborted', 'AbortError'));
       };
 
-      function cleanup() {
+      const cleanup = () => {
         clearTimeout(timer);
         if (this._iframe) {
           this._iframe.removeEventListener('load', onLoad);
         }
         signal?.removeEventListener('abort', onAbort);
-      }
+      };
 
       // Escuchar load directamente en esta promesa también
       this._iframe.addEventListener('load', onLoad, { once: true });

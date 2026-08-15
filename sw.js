@@ -7,7 +7,7 @@
  * ============================================
  */
 
-const CACHE_NAME = 'vspen-v2';
+const CACHE_NAME = 'vspen-v3';
 const OFFLINE_URL = '/vspen/index.html';
 
 // Assets críticos con prefijo /vspen/ para GitHub Pages
@@ -15,7 +15,7 @@ const PRECACHE_ASSETS = [
   '/vspen/',
   '/vspen/index.html',
   '/vspen/manifest.json',
-  '/vspen/app.js',
+  '/vspen/js/app.js',
   '/vspen/assets/icons/favicon.svg',
 
   // CSS
