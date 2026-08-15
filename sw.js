@@ -1,97 +1,117 @@
 /**
  * ============================================
- * VSPen Service Worker
+ * VSPen Service Worker v2
  * Estrategia: Cache-First para assets propios
  *             Network-First para CDNs externos
+ * CORREGIDO: Rutas /vspen/ + Precache tolerante
  * ============================================
  */
 
-const CACHE_NAME = 'vspen-v1';
-const OFFLINE_URL = '/index.html';
+const CACHE_NAME = 'vspen-v2';
+const OFFLINE_URL = '/vspen/index.html';
 
-// Assets críticos que SIEMPRE deben estar disponibles offline
+// Assets críticos con prefijo /vspen/ para GitHub Pages
 const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  
+  '/vspen/',
+  '/vspen/index.html',
+  '/vspen/manifest.json',
+  '/vspen/app.js',
+  '/vspen/assets/icons/favicon.svg',
+
   // CSS
-  '/css/design-system.css',
-  '/css/themes/dark-default.css',
-  '/css/themes/light-default.css',
-  '/css/layout.css',
-  '/css/components.css',
-  '/css/editor.css',
-  
+  '/vspen/css/design-system.css',
+  '/vspen/css/themes/dark-default.css',
+  '/vspen/css/themes/light-default.css',
+  '/vspen/css/layout.css',
+  '/vspen/css/components.css',
+  '/vspen/css/editor.css',
+
   // Core JS
-  '/js/core/constants.js',
-  '/js/core/event-bus.js',
-  '/js/core/service-registry.js',
-  '/js/core/storage-service.js',
-  '/js/core/command-palette.js',
-  
+  '/vspen/js/core/constants.js',
+  '/vspen/js/core/event-bus.js',
+  '/vspen/js/core/service-registry.js',
+  '/vspen/js/core/storage-service.js',
+  '/vspen/js/core/command-palette.js',
+
   // Filesystem JS
-  '/js/filesystem/file-node.js',
-  '/js/filesystem/serializer.js',
-  '/js/filesystem/virtual-fs.js',
-  '/js/filesystem/fs-watchers.js',
-  
+  '/vspen/js/filesystem/file-node.js',
+  '/vspen/js/filesystem/serializer.js',
+  '/vspen/js/filesystem/virtual-fs.js',
+  '/vspen/js/filesystem/fs-watchers.js',
+
   // Editor JS
-  '/js/editor/languages/typescript.js',
-  '/js/editor/languages/javascript.js',
-  '/js/editor/languages/css.js',
-  '/js/editor/languages/html.js',
-  '/js/editor/syntax-highlighter.js',
-  '/js/editor/line-numbers.js',
-  '/js/editor/auto-close-pairs.js',
-  '/js/editor/undo-manager.js',
-  '/js/editor/editor-core.js',
-  
+  '/vspen/js/editor/languages/typescript.js',
+  '/vspen/js/editor/languages/javascript.js',
+  '/vspen/js/editor/languages/css.js',
+  '/vspen/js/editor/languages/html.js',
+  '/vspen/js/editor/syntax-highlighter.js',
+  '/vspen/js/editor/line-numbers.js',
+  '/vspen/js/editor/auto-close-pairs.js',
+  '/vspen/js/editor/undo-manager.js',
+  '/vspen/js/editor/editor-core.js',
+
   // Compiler JS
-  '/js/compiler/cache-layer.js',
-  '/js/compiler/import-resolver.js',
-  '/js/compiler/error-normalizer.js',
-  '/js/compiler/babel-adapter.js',
-  '/js/compiler/compiler-service.js',
-  
+  '/vspen/js/compiler/cache-layer.js',
+  '/vspen/js/compiler/import-resolver.js',
+  '/vspen/js/compiler/error-normalizer.js',
+  '/vspen/js/compiler/babel-adapter.js',
+  '/vspen/js/compiler/compiler-service.js',
+
   // Preview JS
-  '/js/preview/sandbox-manager.js',
-  '/js/preview/preview-bridge.js',
-  '/js/preview/hot-reload.js',
-  
+  '/vspen/js/preview/sandbox-manager.js',
+  '/vspen/js/preview/preview-bridge.js',
+  '/vspen/js/preview/hot-reload.js',
+
   // UI JS
-  '/js/ui/icon-registry.js',
-  '/js/ui/component-system.js',
-  '/js/ui/theme-engine.js',
-  '/js/ui/layout-engine.js',
-  '/js/ui/components/title-bar.js',
-  '/js/ui/components/activity-bar.js',
-  '/js/ui/components/file-explorer.js',
-  '/js/ui/components/tab-bar.js',
-  '/js/ui/components/status-bar.js',
-  '/js/ui/components/error-panel.js',
-  
-  // Bootstrap
-  '/app.js'
+  '/vspen/js/ui/icon-registry.js',
+  '/vspen/js/ui/component-system.js',
+  '/vspen/js/ui/theme-engine.js',
+  '/vspen/js/ui/layout-engine.js',
+  '/vspen/js/ui/components/title-bar.js',
+  '/vspen/js/ui/components/activity-bar.js',
+  '/vspen/js/ui/components/file-explorer.js',
+  '/vspen/js/ui/components/tab-bar.js',
+  '/vspen/js/ui/components/status-bar.js',
+  '/vspen/js/ui/components/error-panel.js'
 ];
 
 // =============================================
-// INSTALL: Precache assets críticos
+// INSTALL: Precache tolerante a fallos
+// Un solo 404 YA NO rompe todo el service worker
 // =============================================
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
+    caches.open(CACHE_NAME).then(async (cache) => {
       console.log('[SW] Precaching assets...');
-      return cache.addAll(PRECACHE_ASSETS);
-    }).then(() => {
-      console.log('[SW] Precache complete');
+
+      const results = await Promise.allSettled(
+        PRECACHE_ASSETS.map(async (url) => {
+          try {
+            await cache.add(url);
+            return { url, ok: true };
+          } catch (err) {
+            console.warn(`[SW] Failed to cache: ${url}`);
+            return { url, ok: false, error: err.message };
+          }
+        })
+      );
+
+      const succeeded = results.filter((r) => r.value?.ok).length;
+      const failed = results.filter((r) => !r.value?.ok);
+
+      if (failed.length > 0) {
+        console.warn(`[SW] ${failed.length} assets failed to precache:`);
+        failed.forEach((f) => console.warn(`  ✗ ${f.value.url}`));
+      }
+
+      console.log(`[SW] Precache complete: ${succeeded}/${results.length} cached`);
       return self.skipWaiting();
     })
   );
 });
 
 // =============================================
-// ACTIVATE: Limpiar caches antiguas
+// ACTIVATE: Limpiar caches antiguas + claim
 // =============================================
 self.addEventListener('activate', (event) => {
   event.waitUntil(
@@ -105,7 +125,7 @@ self.addEventListener('activate', (event) => {
           })
       );
     }).then(() => {
-      console.log('[SW] Activated');
+      console.log('[SW] Activated:', CACHE_NAME);
       return self.clients.claim();
     })
   );
@@ -116,21 +136,19 @@ self.addEventListener('activate', (event) => {
 // =============================================
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
-  
+
   // Ignorar requests no-GET
   if (event.request.method !== 'GET') return;
-  
-  // Ignorar cross-origin que no sean CDNs conocidos
+
+  // Cross-origin: solo manejar CDNs conocidos
   if (url.origin !== location.origin) {
-    // Para CDNs externos (Babel, esm.sh): Network-First con fallback a cache
     if (isKnownCDN(url.hostname)) {
       event.respondWith(networkFirstWithCache(event.request));
-      return;
     }
     // Otros cross-origin: dejar pasar al navegador
     return;
   }
-  
+
   // Assets propios: Cache-First con fallback a network
   event.respondWith(cacheFirstWithNetwork(event.request));
 });
@@ -140,13 +158,13 @@ self.addEventListener('fetch', (event) => {
 // =============================================
 
 /**
- * Cache-First: Intenta cache, si falla va a red y actualiza cache
+ * Cache-First: Intenta cache → si falla va a red → actualiza cache
  * Ideal para assets propios que cambian solo con deploy
  */
 async function cacheFirstWithNetwork(request) {
   const cached = await caches.match(request);
   if (cached) return cached;
-  
+
   try {
     const response = await fetch(request);
     if (response.ok) {
@@ -155,17 +173,21 @@ async function cacheFirstWithNetwork(request) {
     }
     return response;
   } catch {
-    // Fallback offline para navegación
+    // Fallback offline solo para navegación
     if (request.mode === 'navigate') {
       const offlinePage = await caches.match(OFFLINE_URL);
       if (offlinePage) return offlinePage;
     }
-    return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+    return new Response('VSPen is offline', {
+      status: 503,
+      statusText: 'Service Unavailable',
+      headers: { 'Content-Type': 'text/plain' }
+    });
   }
 }
 
 /**
- * Network-First: Intenta red, si falla usa cache
+ * Network-First: Intenta red → si falla usa cache
  * Ideal para CDNs cuyo contenido puede actualizarse
  */
 async function networkFirstWithCache(request) {
@@ -178,7 +200,12 @@ async function networkFirstWithCache(request) {
     return response;
   } catch {
     const cached = await caches.match(request);
-    return cached || new Response('Offline CDN', { status: 503 });
+    if (cached) return cached;
+    return new Response('CDN unavailable', {
+      status: 503,
+      statusText: 'Service Unavailable',
+      headers: { 'Content-Type': 'text/plain' }
+    });
   }
 }
 
@@ -192,24 +219,32 @@ function isKnownCDN(hostname) {
     'cdn.skypack.dev',
     'cdn.jsdelivr.net'
   ];
-  return knownCDNs.some(cdn => hostname.endsWith(cdn));
+  return knownCDNs.some((cdn) => hostname.endsWith(cdn));
 }
 
 // =============================================
 // MESSAGE: Comunicación con la app principal
 // =============================================
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
-    caches.delete(CACHE_NAME).then(() => {
-      event.ports[0].postMessage({ success: true });
-    });
-  }
-  
-  if (event.data && event.data.type === 'GET_VERSION') {
-    event.ports[0].postMessage({ version: CACHE_NAME });
+  if (!event.data || !event.data.type) return;
+
+  switch (event.data.type) {
+    case 'SKIP_WAITING':
+      self.skipWaiting();
+      break;
+
+    case 'CLEAR_CACHE':
+      caches.delete(CACHE_NAME).then(() => {
+        if (event.ports && event.ports[0]) {
+          event.ports[0].postMessage({ success: true });
+        }
+      });
+      break;
+
+    case 'GET_VERSION':
+      if (event.ports && event.ports[0]) {
+        event.ports[0].postMessage({ version: CACHE_NAME });
+      }
+      break;
   }
 });

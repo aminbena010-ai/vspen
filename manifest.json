@@ -24,13 +24,7 @@
       "short_name": "Nuevo",
       "description": "Crear un nuevo proyecto vacío",
       "url": "/vspen/index.html?action=new",
-      "icons": [
-        {
-          "src": "/vspen/assets/icons/favicon.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
-        }
-      ]
+      "icons": [{ "src": "/vspen/assets/icons/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
   ]
 }
