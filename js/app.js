@@ -343,13 +343,18 @@
     const cs = ServiceRegistry.get("componentSystem");
     const vfs = ServiceRegistry.get("vfs");
     const layout = ServiceRegistry.get("layoutEngine");
+    const iconRegistry = ServiceRegistry.get("iconRegistry");
 
     // Montar componentes declarativos
     const titleBarEl = document.getElementById("ui-titlebar");
-    if (titleBarEl) cs.mount(titleBarEl, "title-bar", { title: "VSPen" });
+    if (titleBarEl) {
+      cs.mount(titleBarEl, "title-bar", { title: "VSPen", icons: iconRegistry });
+    }
 
     const activityBarEl = document.getElementById("ui-activitybar");
-    if (activityBarEl) cs.mount(activityBarEl, "activity-bar", { active: "explorer" });
+    if (activityBarEl) {
+      cs.mount(activityBarEl, "activity-bar", { active: "explorer", icons: iconRegistry });
+    }
 
     // File Explorer reactivo
     const explorerEl = document.getElementById("ui-explorer");
@@ -358,6 +363,7 @@
       const explorerInstance = cs.mount(explorerEl, "file-explorer", {
         files: files.map((f) => ({ name: f.name, path: f.getPath(), type: f.type })),
         activeFile: vfs.getCurrentFile(),
+        icons: iconRegistry,
       });
 
       // Actualizar explorer cuando cambien archivos
@@ -377,6 +383,7 @@
         line: 1,
         col: 1,
         errors: 0,
+        icons: iconRegistry,
       });
     }
 
@@ -386,6 +393,7 @@
       const errorInstance = cs.mount(errorPanelEl, "error-panel", {
         visible: false,
         errors: [],
+        icons: iconRegistry,
       });
 
       ServiceRegistry.get("eventBus").on(Constants.EVENTS.COMPILE_ERROR, (data) => {
@@ -414,6 +422,8 @@
         minPrimary: 200,
       });
     }
+
+    console.log("[VSPen] UI initialized with IconRegistry injected");
   }
 
   // =============================================

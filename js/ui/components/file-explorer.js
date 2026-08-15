@@ -2,7 +2,10 @@
  * FILE EXPLORER COMPONENT
  */
 function FileExplorerComponent(props, state, update) {
-  const icons = window.VSPenIcons;
+  const icons = props && props.icons;
+  if (!icons || typeof icons.get !== 'function') {
+    throw new Error('FileExplorerComponent requires props.icons with a get() method');
+  }
   const files = props.files || [];
   const activeFile = props.activeFile || '';
   

@@ -2,7 +2,10 @@
  * TITLE BAR COMPONENT
  */
 function TitleBarComponent(props, state, update) {
-  const icons = window.VSPenIcons;
+  const icons = props && props.icons;
+  if (!icons || typeof icons.get !== 'function') {
+    throw new Error('TitleBarComponent requires props.icons with a get() method');
+  }
   
   return `
     <div class="titlebar">

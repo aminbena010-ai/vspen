@@ -2,7 +2,10 @@
  * ACTIVITY BAR COMPONENT
  */
 function ActivityBarComponent(props, state, update) {
-  const icons = window.VSPenIcons;
+  const icons = props && props.icons;
+  if (!icons || typeof icons.get !== 'function') {
+    throw new Error('ActivityBarComponent requires props.icons with a get() method');
+  }
   const active = props.active || 'explorer';
   
   const items = [
