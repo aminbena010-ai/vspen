@@ -206,7 +206,11 @@
       (eventBus, storage) => new ThemeEngine(eventBus, storage),
       { singleton: true, deps: ["eventBus", "storage"] }
     );
-    ServiceRegistry.register("iconRegistry", () => new IconRegistry(), {
+    // Los componentes se renderizan desde funciones globales, por lo que
+    // necesitan una instancia (no la clase IconRegistry) disponible al montar.
+    const icons = new IconRegistry();
+    window.VSPenIcons = icons;
+    ServiceRegistry.register("iconRegistry", () => icons, {
       singleton: true,
     });
   }

@@ -2,7 +2,7 @@
  * TAB BAR COMPONENT
  */
 function TabBarComponent(props, state, update) {
-  const icons = window.VSPenIconRegistry;
+  const icons = window.VSPenIcons;
   const tabs = props.tabs || [];
   const activeTab = props.activeTab || '';
   

@@ -2,7 +2,7 @@
  * ACTIVITY BAR COMPONENT
  */
 function ActivityBarComponent(props, state, update) {
-  const icons = window.VSPenIconRegistry;
+  const icons = window.VSPenIcons;
   const active = props.active || 'explorer';
   
   const items = [

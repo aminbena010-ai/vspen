@@ -2,7 +2,7 @@
  * STATUS BAR COMPONENT
  */
 function StatusBarComponent(props, state, update) {
-  const icons = window.VSPenIconRegistry;
+  const icons = window.VSPenIcons;
   
   return `
     <div class="statusbar">

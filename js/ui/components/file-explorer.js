@@ -2,7 +2,7 @@
  * FILE EXPLORER COMPONENT
  */
 function FileExplorerComponent(props, state, update) {
-  const icons = window.VSPenIconRegistry;
+  const icons = window.VSPenIcons;
   const files = props.files || [];
   const activeFile = props.activeFile || '';
   
